@@ -3,6 +3,7 @@ application cloudshop (
   $dbpassword,
   $dbuser,
   $dbname,
+  $dbport = 49231,
   $iis_site      = 'Default Web Site',
   $docroot       = 'C:/inetpub/wwwroot',
   $file_source   = 'https://s3-us-west-2.amazonaws.com/tseteam/files/sqlwebapp',
@@ -15,16 +16,23 @@ application cloudshop (
     dbpassword    => $dbpassword,
     dbname        => $dbname,
     dbserver      => $::fqdn,
+    dbport        => $dbport,
     file_source   => $file_source,
     administrator => $administrator,
-    export        => Mssql["orc_sqlapp-${name}"],
+    export        => Database["orc_sqlapp-${name}"],
   }
   $app_count.each |$i| {
     cloudshop::app { "${name}-${i}":
+      dbuser      => $dbuser,
+      dbinstance  => $dbinstance,
+      dbpassword  => $dbpassword,
+      dbname      => $dbname,
+      dbserver    => $::fqdn,
       iis_site    => $iis_site,
       docroot     => $docroot,
+      dbport      => $dbport,
       file_source => $file_source,
-      consume     => Mssql["orc_sqlapp-${name}"],
+      consume     => Database["orc_sqlapp-${name}"],
     }
   }
 }
