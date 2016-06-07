@@ -1,37 +1,125 @@
-###Puppet Cloudshop
+# Cloudshop
 
-####A puppet module to perform App Orchestration with the tse_sqlserver and sqlwebapp modules in the TSE Demo Environment.
+#### Table of Contents
 
-This module will install and setup a MS SQL Server instance with the AdventureWorks2012 DB and serve that to a ASP.NET application hosted on IIS.
+1. [Description](#description)
+2. [Setup - The basics of getting started with Cloudshop](#setup)
+    * [Setup requirements](#setup-requirements)
+    * [Beginning with Cloudshop](#beginning-with-Cloudshop)
+3. [Usage - Configuration options and additional functionality](#usage)
+4. [Reference - An under-the-hood peek at what the module is doing and how](#reference)
+5. [Limitations - OS compatibility, etc.](#limitations)
+6. [Development - Guide for contributing to the module](#development)
 
-#####Single Node Setup:
+## Description
 
-```puppet
+This module sets up a basic Cloudshop all-in-one or split installation. Cloudshop is a basic example Microsoft Windows e-commerce application. This module will install and setup a MS SQL Server instance with the AdventureWorks2012 DB and serve that to a ASP.NET application hosted on IIS. This is intended to work with the new application language constructs in puppet 4.
+
+Specifically this module helps model the dependencies between the database and web components to make up the application Cloudshop. By modeling these dependencies, puppet is able to determine which node to run and set up first.
+
+## Setup
+
+### Setup Requirements
+
+You will need these modules in place to get Cloudshop functional:
+
+```
+## CloudShop
+mod 'mount_iso',
+  :git => 'git@github.com:puppetlabs/puppetlabs-mount_iso.git'
+mod 'puppetlabs/sqlserver'
+mod 'reidmv/unzip'
+mod 'puppetlabs/acl'
+mod 'opentable/windowsfeature'
+mod 'puppetlabs/reboot'
+mod 'windows_firewall',
+  :git => 'git@github.com:voxpupuli/puppet-windows_firewall.git'
+mod 'puppetlabs/powershell'
+mod 'nanliu/staging'
+```
+
+### Beginning with Cloudshop
+
+A user will need at least one windows server if they want to use this module.
+
+## Usage
+
+This section is where you describe how to customize, configure, and do the fancy stuff with your module here. It's especially helpful if you include usage examples and code samples for doing things with your module.
+
+Here is an example of two application instances. A split Cloudshop and an all in one Cloudshop.
+
+```
 site {
   cloudshop { 'allinone':
-    dbinstance                                  => 'MYINSTANCE',
-    dbuser                                      => 'CloudShop',
-    dbpassword                                  => 'Azure$123',
-    dbname                                      => 'AdventureWorks2012',
-    nodes                                       => {
-      Node['server2012r2a.pdx.puppetlabs.demo'] => [Cloudshop::App['allinone'], Cloudshop::Db['allinone']],
+    dbinstance              => 'MYINSTANCE',
+    dbuser                  => 'CloudShop',
+    dbpassword              => 'Azure$123',
+    dbname                  => 'AdventureWorks2012',
+    app_count               => 1,
+    administrator           => 'Administrator',
+    nodes                   => {
+      Node['forthewindows'] => [Cloudshop::App['allinone-0'], Cloudshop::Db['allinone']],
     },
   }
-}
-```
-#####Dual Node Setup:
 
-```puppet
-site {
   cloudshop { 'split':
-    dbinstance                                  => 'MYINSTANCE',
-    dbuser                                      => 'CloudShop',
-    dbpassword                                  => 'Azure$123',
-    dbname                                      => 'AdventureWorks2012',
-    nodes                                       => {
-      Node['server2012r2a.pdx.puppetlabs.demo'] => Cloudshop::App['split'],
-      Node['server2012r2b.syd.puppetlabs.demo'] => Cloudshop::Db['split'],
+    dbinstance              => 'MYINSTANCE',
+    dbuser                  => 'CloudShop',
+    dbpassword              => 'Azure$123',
+    dbname                  => 'AdventureWorks2012',
+    app_count               => 1,
+    administrator           => 'Administrator',
+    nodes                   => {
+      Node['cloudshopapp']  => Cloudshop::App['split-0'],
+      Node['cloudshopdb']   => Cloudshop::Db['split'],
     },
   }
 }
 ```
+
+## Reference
+
+### Application Cloudshop
+
+* `dbinstance`
+  + The name of the database instance for MS SQL Server
+* `dbpassword`
+  + The password to use for your MS SQL database instance
+* `dbuser`
+  + The user to log into your MS SQL database instance
+* `dbname`
+  + The name of your MS SQL database
+* `dbport`
+  + The port that MS SQL Server is listening on
+* `iss_site`
+  + The directory that your Cloudshop module should go under in IIS
+* `docroot`
+  + The directory on disk where your website should be hosted from
+* `file_source`
+  + The location for obtaining either MS SQL Server iso or the Cloudshop application archive
+* `administrator`
+  + The user that should be used to install MS Sql
+* `app_count`
+  + How many Cloudshop application instances you wish to set up
+
+## Limitations
+
+### Known Issues
+
+https://tickets.puppetlabs.com/browse/ORCH-1285
+
+On the first run, the application will fail. This is a known issue
+
+```
+Error running puppet on server2012r2a.pdx.puppetlabs.demo: C:/ProgramData/PuppetLabs/puppet/cache/state/last_run_report.yaml could not be loaded: undefined class/module Puppet::Type::Acl::
+```
+
+#### Known Solution
+
+Run the job a second time and the run should succeed
+
+## Development
+
+## Release Notes/Contributors/Etc. **Optional**
+
+Thanks to James E. Jones for all of the work to get this module going and set up.
