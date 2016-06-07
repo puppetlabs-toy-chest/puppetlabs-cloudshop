@@ -3,7 +3,7 @@ application cloudshop (
   $dbpassword,
   $dbuser,
   $dbname,
-  $dbport = 49231,
+  $dbport,
   $iis_site      = 'Default Web Site',
   $docroot       = 'C:/inetpub/wwwroot',
   $file_source   = 'https://s3-us-west-2.amazonaws.com/tseteam/files/sqlwebapp',
