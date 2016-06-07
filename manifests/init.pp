@@ -21,6 +21,10 @@ application cloudshop (
     administrator => $administrator,
     export        => Database["orc_sqlapp-${name}"],
   }
+  # This 'each' block will set up a given number of
+  # Cloudshop applications based on the parameter `app_count`.
+  # Each application will be given a name followed by the number
+  # starting from 0 up to (app_count - 1)
   $app_count.each |$i| {
     cloudshop::app { "${name}-${i}":
       dbuser      => $dbuser,
