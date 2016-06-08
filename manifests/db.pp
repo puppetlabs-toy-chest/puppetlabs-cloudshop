@@ -48,6 +48,7 @@ define cloudshop::db (
 
     mount_iso { $iso_path :
       drive_letter => $iso_drive,
+      before       => Sqlserver_features['Management_Studio'],
     }
   }
   # tse_sqlserver sql
