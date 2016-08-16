@@ -17,34 +17,11 @@ This module sets up a basic Cloudshop all-in-one or split installation. Cloudsho
 
 Specifically this module helps model the dependencies between the database and web components to make up the application Cloudshop. By modeling these dependencies, puppet is able to determine which node to run and set up first.
 
-## Setup
-
-### Setup Requirements
-
-You will need these modules in place to get Cloudshop functional:
-
-```
-## CloudShop
-mod 'mount_iso',
-  :git => 'git@github.com:puppetlabs/puppetlabs-mount_iso.git'
-mod 'puppetlabs/sqlserver'
-mod 'reidmv/unzip'
-mod 'puppetlabs/acl'
-mod 'opentable/windowsfeature'
-mod 'puppetlabs/reboot'
-mod 'windows_firewall',
-  :git => 'git@github.com:voxpupuli/puppet-windows_firewall.git'
-mod 'puppetlabs/powershell'
-mod 'nanliu/staging'
-```
-
 ### Beginning with Cloudshop
 
 A user will need at least one windows server if they want to use this module.
 
 ## Usage
-
-This section is where you describe how to customize, configure, and do the fancy stuff with your module here. It's especially helpful if you include usage examples and code samples for doing things with your module.
 
 Here is an example of two application instances. A split Cloudshop and an all in one Cloudshop.
 
@@ -120,6 +97,6 @@ Run the job a second time and the run should succeed
 
 ## Development
 
-## Release Notes/Contributors/Etc. **Optional**
+## Release Notes/Contributors/Etc.
 
 Thanks to James E. Jones for all of the work to get this module going and set up.
