@@ -66,7 +66,7 @@ define cloudshop::app (
   staging::file { 'CloudShop.zip':
     source => "${file_source}/CloudShop.zip",
   }
-  unzip { "Unzip webapp CloudShop":
+  unzip { 'Unzip webapp CloudShop':
     source      => "C:/ProgramData/staging/${module_name}/CloudShop.zip",
     creates     => "${docroot}/CloudShop/Web.config",
     destination => "${docroot}/CloudShop",
@@ -76,7 +76,7 @@ define cloudshop::app (
   file { "${docroot}/CloudShop/Web.config":
     ensure  => present,
     content => template("${module_name}/Web.config.erb"),
-    require => Unzip["Unzip webapp CloudShop"],
+    require => Unzip['Unzip webapp CloudShop'],
   }
   exec { 'ConvertAPP':
     command     => "ConvertTo-WebApplication \'IIS:/Sites/${iis_site}/CloudShop\'",

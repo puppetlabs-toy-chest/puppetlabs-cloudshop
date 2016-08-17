@@ -2,7 +2,7 @@
   "name": "puppetlabs-cloudshop",
   "version": "0.1.0",
   "author": "puppetlabs",
-  "summary": null,
+  "summary": "Application module for managing the CloudShop example application",
   "license": "Apache-2.0",
   "source": "https://github.com/puppetlabs/puppetlabs-cloudshop",
   "project_page": "https://github.com/puppetlabs/puppetlabs-cloudshop",

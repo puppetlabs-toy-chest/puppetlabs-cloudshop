@@ -8,7 +8,7 @@ define cloudshop::db (
   $mount_iso = true,
   $iso = 'SQLServer2014-x64-ENU.iso',
   $sqlserver_version = '2014',
-  $iso_source = "https://s3-us-west-2.amazonaws.com/tseteam/files/tse_sqlserver",
+  $iso_source = 'https://s3-us-west-2.amazonaws.com/tseteam/files/tse_sqlserver',
   $iso_drive = 'F',
   $mdf_file      = 'AdventureWorks2012_Data.mdf',
   $ldf_file      = 'AdventureWorks2012_log.ldf',
@@ -55,9 +55,16 @@ define cloudshop::db (
   case $sqlserver_version {
     '2012':  {
       $version_var  = 'MSSQL11'
+      $data_path  = "C:\\Program Files\\Microsoft SQL Server\\MSSQL11.${$dbinstance}\\MSSQL\\DATA"
+      $sqlps_path = 'C:\Program Files (x86)\Microsoft SQL Server\110\Tools\PowerShell\Modules\SQLPS'
     }
     '2014':  {
       $version_var  = 'MSSQL12'
+      $data_path  = "C:\\Program Files\\Microsoft SQL Server\\MSSQL12.${dbinstance}\\MSSQL\\DATA"
+      $sqlps_path = 'C:\Program Files (x86)\Microsoft SQL Server\120\Tools\PowerShell\Modules\SQLPS'
+    }
+    default: {
+      fail("Unknown sqlserver_version '${sqlserver_version}'")
     }
   }
 
@@ -101,7 +108,7 @@ define cloudshop::db (
     enabled      => 'yes',
     program      => 'C:\Program Files (x86)\Microsoft SQL Server\90\Shared\sqlbrowser.exe',
     display_name => 'MSSQL Browser',
-    description  => "MS SQL Server Browser Inbound Access, enabled by Puppet in $module_name",
+    description  => "MS SQL Server Browser Inbound Access, enabled by Puppet in ${module_name}",
   }
 
   windows_firewall::exception { 'Sqlserver access':
@@ -109,21 +116,11 @@ define cloudshop::db (
     direction    => 'in',
     action       => 'Allow',
     enabled      => 'yes',
-    program      => "C:\Program Files\\Microsoft SQL Server\\${version_var}.${dbinstance}\\MSSQL\\Binn\\sqlservr.exe",
+    program      => "C:\\Program Files\\Microsoft SQL Server\\${version_var}.${dbinstance}\\MSSQL\\Binn\\sqlservr.exe",
     display_name => 'MSSQL Access',
-    description  => "MS SQL Server Inbound Access, enabled by Puppet in $module_name",
+    description  => "MS SQL Server Inbound Access, enabled by Puppet in ${module_name}",
   }
-  # tse_sqlserver attachdb
-  case $sqlserver_version {
-    '2012':  {
-      $data_path  = "C:\\Program Files\\Microsoft SQL Server\\MSSQL11.${$dbinstance}\\MSSQL\\DATA"
-      $sqlps_path = 'C:\Program Files (x86)\Microsoft SQL Server\110\Tools\PowerShell\Modules\SQLPS'
-    }
-    '2014':  {
-      $data_path  = "C:\\Program Files\\Microsoft SQL Server\\MSSQL12.${dbinstance}\\MSSQL\\DATA"
-      $sqlps_path = 'C:\Program Files (x86)\Microsoft SQL Server\120\Tools\PowerShell\Modules\SQLPS'
-    }
-  }
+
   staging::file { $zip_file:
     source => "${file_source}\\${zip_file}",
   }
@@ -133,18 +130,18 @@ define cloudshop::db (
     subscribe => Staging::File[$zip_file],
   }
   exec { "Attach ${title}":
-    command     => "import-module \'${sqlps_path}\'; invoke-sqlcmd \"USE [master] CREATE DATABASE [${title}] ON (FILENAME = \'${data_path}\\${mdf_file}\'),(FILENAME = \'${data_path}\\${ldf_file}\') for ATTACH\" -QueryTimeout 3600  -username \'sa\' -password \'${::tse_sqlserver::sql::sa_pass}\' -ServerInstance \'${::hostname}\\${dbinstance}\'",
-    provider    => powershell,
-    path        => $sqlps_path,
-    onlyif      => "import-module \'${sqlps_path}\'; invoke-sqlcmd -Query \"select [name] from sys.databases where [name] = \'${title}\';\" -ServerInstance \"${::hostname}\\${dbinstance}\"| write-error",
+    command  => "import-module \'${sqlps_path}\'; invoke-sqlcmd \"USE [master] CREATE DATABASE [${title}] ON (FILENAME = \'${data_path}\\${mdf_file}\'),(FILENAME = \'${data_path}\\${ldf_file}\') for ATTACH\" -QueryTimeout 3600  -username \'sa\' -password \'${::tse_sqlserver::sql::sa_pass}\' -ServerInstance \'${::hostname}\\${dbinstance}\'",
+    provider => powershell,
+    path     => $sqlps_path,
+    onlyif   => "import-module \'${sqlps_path}\'; invoke-sqlcmd -Query \"select [name] from sys.databases where [name] = \'${title}\';\" -ServerInstance \"${::hostname}\\${dbinstance}\"| write-error",
   }
   exec { "Change owner of ${title}":
-    command     => "import-module \'${sqlps_path}\'; invoke-sqlcmd \"USE [${title}] ALTER AUTHORIZATION ON DATABASE::${title} TO ${owner};\" -QueryTimeout 3600 -username \'sa\' -password \'${::tse_sqlserver::sql::sa_pass}\' -ServerInstance \'${::hostname}\\${dbinstance}\'",
-    provider    => powershell,
-    onlyif      => "import-module \'${sqlps_path}\'; invoke-sqlcmd -Query \"select suser_sname(owner_sid) from sys.databases where [name] = \'${title}\';\" -ServerInstance \"$::hostname\\${dbinstance}\" | where-object \"Column1\" -eq \"${owner}\" | write-error",
-    subscribe   => Exec["Attach ${title}"],
+    command   => "import-module \'${sqlps_path}\'; invoke-sqlcmd \"USE [${title}] ALTER AUTHORIZATION ON DATABASE::${title} TO ${owner};\" -QueryTimeout 3600 -username \'sa\' -password \'${::tse_sqlserver::sql::sa_pass}\' -ServerInstance \'${::hostname}\\${dbinstance}\'",
+    provider  => powershell,
+    onlyif    => "import-module \'${sqlps_path}\'; invoke-sqlcmd -Query \"select suser_sname(owner_sid) from sys.databases where [name] = \'${title}\';\" -ServerInstance \"${::hostname}\\${dbinstance}\" | where-object \"Column1\" -eq \"${owner}\" | write-error",
+    subscribe => Exec["Attach ${title}"],
   }
-  sqlserver::login{ "${owner}":
+  sqlserver::login{ $owner:
     instance => $dbinstance,
     password => $dbpass,
     notify   => Exec["Attach ${title}"],
