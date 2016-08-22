@@ -13,7 +13,7 @@
 
 ## Description
 
-CloudShop is a Microsoft Windows e-commerce application, and this module sets up a basic all-in-one or split CloudShop installation. Using this module you can install and configure an Microsoft SQL Server instance with an AdventureWorks2012 database that is served to an ASP.NET application hosted on IIS. 
+CloudShop is a Microsoft Windows e-commerce application, and this module sets up a basic all-in-one or split CloudShop installation. Using this module you can install and configure a Microsoft SQL Server instance with an AdventureWorks2012 database that is served to an ASP.NET application hosted on IIS. 
 
 This module is only compatible with the application language constructs available in Puppet 4. More specifically, this module models the dependencies between the database and web components that make up the CloudShop application. By modeling these dependencies, Puppet is able to determine the node run order in which to configure the application.
 
