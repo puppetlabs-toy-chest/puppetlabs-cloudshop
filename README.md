@@ -1,11 +1,11 @@
-# Cloudshop
+# CloudShop
 
 #### Table of Contents
 
 1. [Description](#description)
-2. [Setup - The basics of getting started with Cloudshop](#setup)
+2. [Setup - The basics of getting started with CloudShop](#setup)
     * [Setup requirements](#setup-requirements)
-    * [Beginning with Cloudshop](#beginning-with-Cloudshop)
+    * [Beginning with CloudShop](#beginning-with-cloudshop)
 3. [Usage - Configuration options and additional functionality](#usage)
 4. [Reference - An under-the-hood peek at what the module is doing and how](#reference)
 5. [Limitations - OS compatibility, etc.](#limitations)
@@ -13,17 +13,17 @@
 
 ## Description
 
-This module sets up a basic Cloudshop all-in-one or split installation. Cloudshop is a basic example Microsoft Windows e-commerce application. This module will install and setup a MS SQL Server instance with the AdventureWorks2012 DB and serve that to a ASP.NET application hosted on IIS. This is intended to work with the new application language constructs in puppet 4.
+CloudShop is a Microsoft Windows e-commerce application, and this module sets up a basic all-in-one or split CloudShop installation. Using this module you can install and configure a Microsoft SQL Server instance with an AdventureWorks2012 database that is served to an ASP.NET application hosted on IIS. 
 
-Specifically this module helps model the dependencies between the database and web components to make up the application Cloudshop. By modeling these dependencies, puppet is able to determine which node to run and set up first.
+This module is only compatible with the application language constructs available in Puppet 4. More specifically, this module models the dependencies between the database and web components that make up the CloudShop application. By modeling these dependencies, Puppet is able to determine the node run order in which to configure the application.
 
-### Beginning with Cloudshop
+### Beginning with CloudShop
 
-A user will need at least one windows server if they want to use this module.
+To use this module, you need at least one Windows server.
 
 ## Usage
 
-Here is an example of two application instances. A split Cloudshop and an all in one Cloudshop.
+The following example shows two CloudShop application instances---a split install and an all-in-one install.
 
 ```
 site {
@@ -56,34 +56,22 @@ site {
 
 ## Reference
 
-### Application Cloudshop
+### Application CloudShop
 
-* `dbinstance`
-  + The name of the database instance for MS SQL Server
-* `dbpassword`
-  + The password to use for your MS SQL database instance
-* `dbuser`
-  + The user to log into your MS SQL database instance
-* `dbname`
-  + The name of your MS SQL database
-* `dbport`
-  + The port that MS SQL Server is listening on
-* `iss_site`
-  + The directory that your Cloudshop module should go under in IIS
-* `docroot`
-  + The directory on disk where your website should be hosted from
-* `file_source`
-  + The location for obtaining either MS SQL Server iso or the Cloudshop application archive
-* `administrator`
-  + The user that should be used to install MS Sql
-* `app_count`
-  + How many Cloudshop application instances you wish to set up
+* `dbinstance`: The name of the database instance for the Microsoft SQL Server instance.
+* `dbpassword`: The password to use for the Microsoft SQL Server instance.
+* `dbuser`: The user to log into the Microsoft SQL Server instance.
+* `dbname`: The name of the Microsoft SQL Server instance.
+* `dbport`: The port the Microsoft SQL Server listens on.
+* `iss_site`: The IIS directory that contains the CloudShop module.
+* `docroot`: The directory on disk from which your website is hosted.
+* `file_source`: The location for obtaining the Microsoft SQL Server ISO or the location of the CloudShop application archive.
+* `administrator`: The user used to install the Microsoft SQL Server.
+* `app_count`: The number of CloudShop application instances to set up.
 
 ## Limitations
 
 ### Known Issues
-
-https://tickets.puppetlabs.com/browse/ORCH-1285
 
 On the first run, the application will fail. This is a known issue
 
